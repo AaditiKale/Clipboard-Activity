@@ -1,0 +1,57 @@
+// MainActivity.java
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText editText;
+    Button copyButton, pasteButton;
+    ClipboardManager clipboardManager;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        editText = findViewById(R.id.editText);
+        copyButton = findViewById(R.id.copyButton);
+        pasteButton = findViewById(R.id.pasteButton);
+
+        clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+
+        copyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = editText.getText().toString().trim();
+                if (!text.isEmpty()) {
+                    ClipData clipData = ClipData.newPlainText("text", text);
+                    clipboardManager.setPrimaryClip(clipData);
+                    Toast.makeText(MainActivity.this, "Text copied to clipboard", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Nothing to copy", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        pasteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (clipboardManager.hasPrimaryClip()) {
+                    ClipData.Item item = clipboardManager.getPrimaryClip().getItemAt(0);
+                    String text = item.getText().toString();
+                    editText.setText(text);
+                    Toast.makeText(MainActivity.this, "Text pasted from clipboard", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Clipboard is empty", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+}
